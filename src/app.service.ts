@@ -11,33 +11,57 @@ export interface IMeasure {
 
 @Injectable()
 export class AppService {
-  initialData: IMeasure;
+  initialData: IMeasure[];
 
   constructor(private readonly websocketGateway: AppGateway) {
-    this.initialData = {
+    this.initialData = [{
       deviceId: '123',
       measure: 'Temperature',
       value: '18',
       time: new Date()
-    }
-  }
-
-  getInitialMeasure(): IMeasure {
-    return this.initialData;
-  }
-
-  createNewMeasure(body): IMeasure {
-    this.initialData = {
-      ...body,
+    },
+    {
+      deviceId: '456',
+      measure: 'Humidity',
+      value: '40',
       time: new Date()
-    }
-    this.sendMessageToClients(this.initialData);
+    },
+    {
+      deviceId: '789',
+      measure: 'Pressure',
+      value: '120',
+      time: new Date()
+    }]
+  }
+
+  getInitialMeasure(): IMeasure[] {
     return this.initialData;
   }
 
-  sendMessageToClients(data: IMeasure): void {
+  getInitialMeasureByID(deviceID: string): IMeasure {
+    return this.initialData.find((each) => each?.deviceId === `${deviceID}`);
+  }
+
+  updateMeasure(body, deviceId): IMeasure {
+    const time = new Date();
+    this.initialData = this.initialData.map((each)=>{
+      if( each?.deviceId === `${deviceId}`) {
+        return {
+          ...body,
+          time
+        }
+      } else{
+        return each;
+      }
+    })
+    
+    this.sendMessageToClients(deviceId, {...body, time});
+    return this.getInitialMeasureByID(deviceId);
+  }
+
+  sendMessageToClients(deviceId: string, body): void {
     // Access the WebSocket server instance and send a message
-    const response = this.websocketGateway.server.emit('update_data', data);    
+    this.websocketGateway.sendmessage(deviceId, body);  
   }
 
 }

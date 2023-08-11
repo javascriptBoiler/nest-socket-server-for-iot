@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Patch, Body, Param } from '@nestjs/common';
 import { AppService, IMeasure } from './app.service';
 import {CreateMeasureeDto} from './dto'
 
@@ -11,12 +11,20 @@ export class AppController {
   }
 
   @Get('measure')
-  getCurrentMeasure(): IMeasure {
+  getCurrentMeasure(): IMeasure[] {
     return this.appService.getInitialMeasure();
   }
 
-  @Post('measure')
-  createNewRecord(@Body() body: CreateMeasureeDto,): IMeasure {
-    return this.appService.createNewMeasure(body);
+  @Get('measure/:deviceId')
+  getCurrentMeasureByDevice(@Param('deviceId') deviceId: string): IMeasure {
+    return this.appService.getInitialMeasureByID(deviceId);
+  }
+
+  @Patch('measure/:deviceId')
+  createNewRecord(
+    @Body() body: CreateMeasureeDto,
+    @Param('deviceId') deviceId: string
+  ): IMeasure {
+    return this.appService.updateMeasure(body, deviceId);
   }
 }

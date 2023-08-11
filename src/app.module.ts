@@ -7,6 +7,6 @@ import { SocketService } from './socket/socket.service';
 @Module({
   imports: [],
   controllers: [AppController],
-  providers: [AppGateway, SocketService, AppService],
+  providers: [AppService, AppGateway, SocketService],
 })
 export class AppModule {}
